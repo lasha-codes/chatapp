@@ -3,12 +3,19 @@ const dotenv = require('dotenv')
 const jwt = require('jsonwebtoken')
 const mongoose = require('mongoose')
 const app = express()
+const cors = require('cors')
 const User = require('./models/User.js')
 
 dotenv.config()
 mongoose.connect(process.env.MONGO_URL)
 const jwtSecret = process.env.JWT_SECRET
 
+app.use(
+  cors({
+    origin: 'http://localhost:5173',
+    credentials: true,
+  })
+)
 app.use(express.json())
 
 app.get('/test', (req, res) => {
