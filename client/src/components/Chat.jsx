@@ -1,10 +1,13 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { useEffect, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import Avatar from './Avatar'
+import { UserContext } from '../context/UserContext'
 
 const Chat = () => {
   const [ws, setWs] = useState(null)
   const [onlinePeople, setOnlinePeople] = useState({})
+  const [selectedUserId, setSelectedUserId] = useState(null)
+  const { id } = useContext(UserContext)
 
   useEffect(() => {
     const ws = new WebSocket('ws://localhost:4000')
@@ -27,9 +30,13 @@ const Chat = () => {
     }
   }
 
+  const onlinePeopleExclOurUser = { ...onlinePeople }
+  delete onlinePeopleExclOurUser[id]
+  console.log(onlinePeopleExclOurUser)
+
   return (
     <div className='flex h-screen'>
-      <div className='bg-white w-1/3 pl-4 pt-4'>
+      <div className='bg-white w-1/3 px-4 pt-4'>
         <div className='text-blue-600 text-xl font-bold flex items-center gap-2 mb-4'>
           <svg
             xmlns='http://www.w3.org/2000/svg'
@@ -42,14 +49,18 @@ const Chat = () => {
           </svg>
           MernChat
         </div>
-        {Object.keys(onlinePeople).map((userId) => {
+
+        {Object.keys(onlinePeopleExclOurUser).map((userId) => {
           return (
             <div
+              onClick={() => setSelectedUserId(userId)}
               key={userId}
-              className='border-b border-gray-100 py flex items-center gap-2 py-2'
+              className={`border-b border-gray-100 py flex items-center gap-2 py-2 cursor-pointer rounded-xl transition-all duration-300 ease-in-out px-3 ${
+                userId === selectedUserId ? 'bg-blue-50' : ''
+              }`}
             >
               <Avatar username={onlinePeople[userId]} userId={userId} />
-              <span className=''>{onlinePeople[userId]}</span>
+              <span className='text-gray-800'>{onlinePeople[userId]}</span>
             </div>
           )
         })}
