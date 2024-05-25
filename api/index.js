@@ -7,6 +7,7 @@ const cors = require('cors')
 const bcrypt = require('bcryptjs')
 const User = require('./models/User.js')
 const cookieParser = require('cookie-parser')
+const ws = require('ws')
 
 dotenv.config()
 mongoose.connect(process.env.MONGO_URL)
@@ -92,6 +93,12 @@ app.post('/register', async (req, res) => {
   }
 })
 
-app.listen(4000, () => {
+const server = app.listen(4000, () => {
   console.log('Server running')
+})
+
+const wss = new ws.WebSocketServer({ server })
+wss.on('connection', (connection) => {
+  console.log('connected')
+  connection.send('hello')
 })
