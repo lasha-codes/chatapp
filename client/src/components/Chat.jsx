@@ -1,20 +1,38 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useState } from 'react'
 
 const Chat = () => {
   const [ws, setWs] = useState(null)
+  const [onlinePeople, setOnlinePeople] = useState({})
+
   useEffect(() => {
     const ws = new WebSocket('ws://localhost:4000')
     setWs(ws)
     ws.addEventListener('message', handleMessage)
   }, [])
 
+  const showOnlinePeople = (peopleArray) => {
+    const people = {}
+    peopleArray.forEach(({ userId, username }) => {
+      people[userId] = username
+    })
+    setOnlinePeople(people)
+  }
+
   function handleMessage(e) {
-    console.log('new message', e)
+    const messageData = JSON.parse(e.data)
+    if ('online' in messageData) {
+      showOnlinePeople(messageData.online)
+    }
   }
 
   return (
     <div className='flex h-screen'>
-      <div className='bg-white w-1/3'>contacts</div>
+      <div className='bg-white w-1/3'>
+        {Object.keys(onlinePeople).map((userId) => {
+          return <div key={userId}>{onlinePeople[userId]}</div>
+        })}
+      </div>
       <div className='flex flex-col bg-blue-50 w-2/3 p-2'>
         <div className='flex-grow'>messages with selected person</div>
         <div className='flex items-center gap-2'>
