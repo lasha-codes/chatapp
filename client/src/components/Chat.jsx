@@ -7,6 +7,8 @@ const Chat = () => {
   const [ws, setWs] = useState(null)
   const [onlinePeople, setOnlinePeople] = useState({})
   const [selectedUserId, setSelectedUserId] = useState(null)
+  const [newMessageText, setNewMessageText] = useState('')
+
   const { id } = useContext(UserContext)
 
   useEffect(() => {
@@ -32,7 +34,6 @@ const Chat = () => {
 
   const onlinePeopleExclOurUser = { ...onlinePeople }
   delete onlinePeopleExclOurUser[id]
-  console.log(onlinePeopleExclOurUser)
 
   return (
     <div className='flex h-screen'>
@@ -55,25 +56,44 @@ const Chat = () => {
             <div
               onClick={() => setSelectedUserId(userId)}
               key={userId}
-              className={`border-b border-gray-100 py flex items-center gap-2 py-2 cursor-pointer rounded-xl transition-all duration-300 ease-in-out px-3 ${
+              className={`border-b border-gray-100 py flex items-center gap-2 cursor-pointer rounded-xl transition-all duration-300 ease-in-out ${
                 userId === selectedUserId ? 'bg-blue-50' : ''
               }`}
             >
-              <Avatar username={onlinePeople[userId]} userId={userId} />
-              <span className='text-gray-800'>{onlinePeople[userId]}</span>
+              <div
+                className={`transition-all duration-300 rounded-r-md ease-out ${
+                  selectedUserId === userId
+                    ? 'h-11 ml-[2px] w-1 bg-blue-500'
+                    : 'w-0 opacity-0 bg-transparent'
+                }`}
+              ></div>
+              <div className='flex items-center gap-2 py-2 px-3'>
+                <Avatar username={onlinePeople[userId]} userId={userId} />
+                <span className='text-gray-800'>{onlinePeople[userId]}</span>
+              </div>
             </div>
           )
         })}
       </div>
       <div className='flex flex-col bg-blue-50 w-2/3 p-2'>
-        <div className='flex-grow'>messages with selected person</div>
-        <div className='flex items-center gap-2'>
+        <div className='flex-grow'>
+          {!selectedUserId && (
+            <div className='flex items-center h-full justify-center'>
+              <span className='text-gray-300 text-lg'>
+                &larr; Select a person from the sidebar
+              </span>
+            </div>
+          )}
+        </div>
+        <form className='flex items-center gap-2'>
           <input
+            value={newMessageText}
+            onChange={(e) => setNewMessageText(e.target.value)}
             type='text'
             placeholder='Type your message here'
             className='bg-white flex-grow border p-2'
           />
-          <button className='bg-blue-500 p-2 text-white'>
+          <button type='submit' className='bg-blue-500 p-2 text-white'>
             <svg
               xmlns='http://www.w3.org/2000/svg'
               fill='none'
@@ -89,7 +109,7 @@ const Chat = () => {
               />
             </svg>
           </button>
-        </div>
+        </form>
       </div>
     </div>
   )
