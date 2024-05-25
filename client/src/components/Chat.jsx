@@ -8,6 +8,7 @@ const Chat = () => {
   const [onlinePeople, setOnlinePeople] = useState({})
   const [selectedUserId, setSelectedUserId] = useState(null)
   const [newMessageText, setNewMessageText] = useState('')
+  const [messages, setMessages] = useState([])
 
   const { id } = useContext(UserContext)
 
@@ -27,10 +28,12 @@ const Chat = () => {
 
   function handleMessage(e) {
     const messageData = JSON.parse(e.data)
+    console.log({ e, messageData })
     if ('online' in messageData) {
       showOnlinePeople(messageData.online)
     } else {
       console.log(messageData)
+      setMessages((prev) => [...prev, { isOur: false, text: messageData.text }])
     }
   }
 
@@ -42,6 +45,8 @@ const Chat = () => {
         text: newMessageText,
       })
     )
+    setMessages((prev) => [...prev, { text: newMessageText }])
+    setNewMessageText('')
   }
 
   const onlinePeopleExclOurUser = { ...onlinePeople }
@@ -94,6 +99,13 @@ const Chat = () => {
               <span className='text-gray-300 text-lg'>
                 &larr; Select a person from the sidebar
               </span>
+            </div>
+          )}
+          {!!selectedUserId && (
+            <div>
+              {messages.map((message, idx) => {
+                return <div key={idx}>{message.text}</div>
+              })}
             </div>
           )}
         </div>
