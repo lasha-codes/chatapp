@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { useContext, useEffect, useState } from 'react'
+import { useContext, useEffect, useRef, useState } from 'react'
 import Avatar from './Avatar'
 import { UserContext } from '../context/UserContext'
 import { uniqBy } from 'lodash'
@@ -12,6 +12,7 @@ const Chat = () => {
   const [messages, setMessages] = useState([])
 
   const { id } = useContext(UserContext)
+  const divUnderMessages = useRef()
 
   useEffect(() => {
     const ws = new WebSocket('ws://localhost:4000')
@@ -55,8 +56,16 @@ const Chat = () => {
         id: Date.now(),
       },
     ])
+
     setNewMessageText('')
   }
+
+  useEffect(() => {
+    const div = divUnderMessages.current
+    if (div) {
+      div.scrollIntoView({ behavior: 'smooth', block: 'end' })
+    }
+  }, [messages])
 
   const onlinePeopleExclOurUser = { ...onlinePeople }
   delete onlinePeopleExclOurUser[id]
@@ -114,7 +123,7 @@ const Chat = () => {
           )}
           {!!selectedUserId && (
             <div className='relative h-full'>
-              <div className='absolute inset-0 overflow-y-auto'>
+              <div className='absolute top-0 left-0 right-0 bottom-2 overflow-y-auto'>
                 {messagesWithoutDupes.map((message, idx) => {
                   return (
                     <div
@@ -135,6 +144,7 @@ const Chat = () => {
                     </div>
                   )
                 })}
+                <div ref={divUnderMessages}></div>
               </div>
             </div>
           )}
