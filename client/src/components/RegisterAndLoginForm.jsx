@@ -44,14 +44,20 @@ const RegisterAndLoginForm = () => {
           {isLoginOrRegister === 'register' ? (
             <div>
               Already a member?
-              <button onClick={() => setIsLoginOrRegister('login')}>
+              <button
+                type='button'
+                onClick={() => setIsLoginOrRegister('login')}
+              >
                 Login here
               </button>
             </div>
           ) : (
             <div>
               {"Don't have an account?"}
-              <button onClick={() => setIsLoginOrRegister('register')}>
+              <button
+                type='button'
+                onClick={() => setIsLoginOrRegister('register')}
+              >
                 Register
               </button>
             </div>
