@@ -26,12 +26,15 @@ app.get('/test', (req, res) => {
 
 app.get('/profile', (req, res) => {
   const { token } = req.cookies
-  jwt.verify(token, jwtSecret, {}, (err, userData) => {
-    if (err) throw err
-
-    res.json(userData)
-  })
+  if (!token) {
+    return
+  }
   try {
+    jwt.verify(token, jwtSecret, {}, (err, userData) => {
+      if (err) throw err
+
+      res.json(userData)
+    })
   } catch (err) {
     res.status(500).json({ message: err.message })
   }
