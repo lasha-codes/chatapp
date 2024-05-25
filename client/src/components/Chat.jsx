@@ -2,6 +2,7 @@
 import { useContext, useEffect, useState } from 'react'
 import Avatar from './Avatar'
 import { UserContext } from '../context/UserContext'
+import { uniqBy } from 'lodash'
 
 const Chat = () => {
   const [ws, setWs] = useState(null)
@@ -31,9 +32,8 @@ const Chat = () => {
     console.log({ e, messageData })
     if ('online' in messageData) {
       showOnlinePeople(messageData.online)
-    } else {
-      console.log(messageData)
-      setMessages((prev) => [...prev, { isOur: false, text: messageData.text }])
+    } else if ('text' in messageData) {
+      setMessages((prev) => [...prev, { ...messageData }])
     }
   }
 
@@ -42,15 +42,26 @@ const Chat = () => {
     ws.send(
       JSON.stringify({
         recipient: selectedUserId,
+        sender: id,
         text: newMessageText,
       })
     )
-    setMessages((prev) => [...prev, { text: newMessageText }])
+    setMessages((prev) => [
+      ...prev,
+      {
+        text: newMessageText,
+        percipient: selectedUserId,
+        sender: id,
+        id: Date.now(),
+      },
+    ])
     setNewMessageText('')
   }
 
   const onlinePeopleExclOurUser = { ...onlinePeople }
   delete onlinePeopleExclOurUser[id]
+
+  const messagesWithoutDupes = uniqBy(messages, 'id')
 
   return (
     <div className='flex h-screen'>
@@ -102,10 +113,29 @@ const Chat = () => {
             </div>
           )}
           {!!selectedUserId && (
-            <div>
-              {messages.map((message, idx) => {
-                return <div key={idx}>{message.text}</div>
-              })}
+            <div className='relative h-full'>
+              <div className='absolute inset-0 overflow-y-auto'>
+                {messagesWithoutDupes.map((message, idx) => {
+                  return (
+                    <div
+                      key={idx}
+                      className={`${
+                        message.sender === id ? 'text-right' : 'text-left'
+                      }`}
+                    >
+                      <div
+                        className={`p-2 m-2 rounded-md text-sm inline-block ${
+                          message.sender === id
+                            ? 'bg-blue-500 text-white'
+                            : 'bg-white text-gray-500'
+                        }`}
+                      >
+                        {message.text}
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
             </div>
           )}
         </div>
