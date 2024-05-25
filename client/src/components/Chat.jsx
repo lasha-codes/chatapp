@@ -29,7 +29,19 @@ const Chat = () => {
     const messageData = JSON.parse(e.data)
     if ('online' in messageData) {
       showOnlinePeople(messageData.online)
+    } else {
+      console.log(messageData)
     }
+  }
+
+  const sendMessage = (e) => {
+    e.preventDefault()
+    ws.send(
+      JSON.stringify({
+        recipient: selectedUserId,
+        text: newMessageText,
+      })
+    )
   }
 
   const onlinePeopleExclOurUser = { ...onlinePeople }
@@ -85,31 +97,33 @@ const Chat = () => {
             </div>
           )}
         </div>
-        <form className='flex items-center gap-2'>
-          <input
-            value={newMessageText}
-            onChange={(e) => setNewMessageText(e.target.value)}
-            type='text'
-            placeholder='Type your message here'
-            className='bg-white flex-grow border p-2'
-          />
-          <button type='submit' className='bg-blue-500 p-2 text-white'>
-            <svg
-              xmlns='http://www.w3.org/2000/svg'
-              fill='none'
-              viewBox='0 0 24 24'
-              strokeWidth={1.5}
-              stroke='currentColor'
-              className='size-6'
-            >
-              <path
-                strokeLinecap='round'
-                strokeLinejoin='round'
-                d='M6 12 3.269 3.125A59.769 59.769 0 0 1 21.485 12 59.768 59.768 0 0 1 3.27 20.875L5.999 12Zm0 0h7.5'
-              />
-            </svg>
-          </button>
-        </form>
+        {!!selectedUserId && (
+          <form className='flex items-center gap-2' onSubmit={sendMessage}>
+            <input
+              value={newMessageText}
+              onChange={(e) => setNewMessageText(e.target.value)}
+              type='text'
+              placeholder='Type your message here'
+              className='bg-white flex-grow border p-2'
+            />
+            <button type='submit' className='bg-blue-500 p-2 text-white'>
+              <svg
+                xmlns='http://www.w3.org/2000/svg'
+                fill='none'
+                viewBox='0 0 24 24'
+                strokeWidth={1.5}
+                stroke='currentColor'
+                className='size-6'
+              >
+                <path
+                  strokeLinecap='round'
+                  strokeLinejoin='round'
+                  d='M6 12 3.269 3.125A59.769 59.769 0 0 1 21.485 12 59.768 59.768 0 0 1 3.27 20.875L5.999 12Zm0 0h7.5'
+                />
+              </svg>
+            </button>
+          </form>
+        )}
       </div>
     </div>
   )
