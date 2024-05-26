@@ -24,8 +24,21 @@ app.use(
 app.use(express.json())
 app.use(cookieParser())
 
-app.get('/test', (req, res) => {
-  res.json('test ok')
+app.post('/messages', async (req, res) => {
+  const { myId, selectedUserId } = req.body
+  console.log(myId)
+  const myMessages = await Message.find({
+    recipient: selectedUserId,
+    sender: myId,
+  }).sort({ createdAt: -1 })
+  const otherGuysMessages = await Message.find({
+    recipient: myId,
+    sender: selectedUserId,
+  })
+  const allMessages = [...myMessages, ...otherGuysMessages].sort((a, b) => {
+    return a.createdAt - b.createdAt
+  })
+  res.json(allMessages)
 })
 
 app.get('/profile', (req, res) => {

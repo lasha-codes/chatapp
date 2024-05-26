@@ -3,6 +3,7 @@ import { useContext, useEffect, useRef, useState } from 'react'
 import Avatar from './Avatar'
 import { UserContext } from '../context/UserContext'
 import { uniqBy } from 'lodash'
+import axios from 'axios'
 
 const Chat = () => {
   const [ws, setWs] = useState(null)
@@ -19,6 +20,17 @@ const Chat = () => {
     setWs(ws)
     ws.addEventListener('message', handleMessage)
   }, [])
+
+  useEffect(() => {
+    const getMessages = async () => {
+      const response = await axios.post('/messages', {
+        myId: id,
+        selectedUserId,
+      })
+      console.log(response.data)
+    }
+    getMessages()
+  }, [selectedUserId])
 
   const showOnlinePeople = (peopleArray) => {
     const people = {}
