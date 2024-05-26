@@ -23,11 +23,11 @@ const Chat = () => {
 
   useEffect(() => {
     const getMessages = async () => {
-      const response = await axios.post('/messages', {
+      const { data } = await axios.post('/messages', {
         myId: id,
         selectedUserId,
       })
-      console.log(response.data)
+      setMessages([...data])
     }
     getMessages()
   }, [selectedUserId])
@@ -65,7 +65,7 @@ const Chat = () => {
         text: newMessageText,
         percipient: selectedUserId,
         sender: id,
-        id: Date.now(),
+        _id: Date.now(),
       },
     ])
 
@@ -82,7 +82,7 @@ const Chat = () => {
   const onlinePeopleExclOurUser = { ...onlinePeople }
   delete onlinePeopleExclOurUser[id]
 
-  const messagesWithoutDupes = uniqBy(messages, 'id')
+  const messagesWithoutDupes = uniqBy(messages, '_id')
 
   return (
     <div className='flex h-screen'>
